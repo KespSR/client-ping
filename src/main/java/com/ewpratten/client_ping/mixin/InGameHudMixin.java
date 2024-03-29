@@ -23,18 +23,18 @@ public class InGameHudMixin {
 
 		// Get as a regular string
 		String messageString = message.getString();
+		String[] parts = messageString.split(" ", 3);
 
-		// If there aren't enough parts, don't do anything
-		if (messageString.split(" ").length < 2) {
-			return;
+		if (parts.length < 3) {
+			return; // No es el formato esperado, retorna temprano
 		}
 
-		// Try to parse the username from the first chunk
-		String username = messageString.split(" ")[0];
-		username = username.substring(1, username.length() - 1);
+// El nombre de usuario estaría en la segunda parte, después de omitir el prefijo [Town]/[Nation]
+// Además, eliminamos los dos puntos al final si están presentes
+		String username = parts[1].endsWith(":") ? parts[1].substring(0, parts[1].length() - 1) : parts[1];
 
-		// The remainder of the message might be a ping message
-		String chatBody = messageString.split(" ", 2)[1];
+// El cuerpo del mensaje es la tercera parte después de dividir por el segundo espacio
+		String chatBody = parts[2];
 		Ping parseResult = Ping.deserialize(chatBody, username);
 		if (parseResult == null) {
 			return;
