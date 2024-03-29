@@ -24,14 +24,14 @@ public class PingDispatcher {
 	private PingRegistry registry = PingRegistry.getInstance();
 	private KeyBind keyBind;
 	private long lastPingTimestamp = 0;
-	private final long PING_COOLDOWN = 1000;
+	private final long PING_COOLDOWN = 2000;
 
 	// Create a ping dispatcher and connect to the ping key bind
 	public PingDispatcher() {
 		// Register the default ping key bind
 		Globals.LOGGER.info("Setting up ping key bind");
 		this.keyBind = KeyBindingHelper.registerKeyBinding(new KeyBind("key.client_ping.ping",
-				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_Z, "category.client_ping.main"));
+			InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_Z, "category.client_ping.main"));
 
 		// Get the client instance
 		this.client = MinecraftClient.getInstance();
@@ -45,7 +45,7 @@ public class PingDispatcher {
 		ClientTickEvents.END.register(client -> {
 			// If the key is pressed and we are outside of the cooldown
 			while (this.keyBind.wasPressed()
-					&& (System.currentTimeMillis() - this.lastPingTimestamp > this.PING_COOLDOWN)) {
+				&& (System.currentTimeMillis() - this.lastPingTimestamp > this.PING_COOLDOWN)) {
 				this.createPing();
 			}
 		});
@@ -56,9 +56,9 @@ public class PingDispatcher {
 		Vec3d cameraPosition = this.client.player.getCameraPosVec(1.0F);
 		Vec3d cameraRay1000Blocks = this.client.player.getRotationVec(1.0F).multiply(1000.0D).add(cameraPosition);
 		BlockHitResult hitResult = this.client.world.raycast(new RaycastContext(cameraPosition, cameraRay1000Blocks,
-				ShapeType.COLLIDER, FluidHandling.NONE, this.client.player));
+			ShapeType.COLLIDER, FluidHandling.NONE, this.client.player));
 		Vec3i hitPosition = new Vec3i((int) Math.floor(hitResult.getPos().x), (int) Math.floor(hitResult.getPos().y),
-				(int) Math.floor(hitResult.getPos().z));
+			(int) Math.floor(hitResult.getPos().z));
 
 		// If there is no hit, skip
 		if (hitResult.getType() == HitResult.Type.MISS) {
@@ -72,7 +72,7 @@ public class PingDispatcher {
 		this.lastPingTimestamp = System.currentTimeMillis();
 		String currentDimension = this.client.world.getRegistryKey().getValue().toString();
 		Ping ping = new Ping(this.client.player.getName().getString(),
-				new DimensionPosition(currentDimension, hitPosition), lastPingTimestamp);
+			new DimensionPosition(currentDimension, hitPosition), lastPingTimestamp);
 
 		// Broadcast the ping
 		Globals.LOGGER.info("Player pinged at " + hitPosition.toString());

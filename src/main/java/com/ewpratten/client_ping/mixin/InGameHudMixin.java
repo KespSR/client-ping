@@ -25,20 +25,42 @@ public class InGameHudMixin {
 		String messageString = message.getString();
 		String[] parts = messageString.split(" ", 3);
 
+
 		if (parts.length < 3) {
 			return; // No es el formato esperado, retorna temprano
 		}
-
-// El nombre de usuario estaría en la segunda parte, después de omitir el prefijo [Town]/[Nation]
-// Además, eliminamos los dos puntos al final si están presentes
-		String username = parts[1].endsWith(":") ? parts[1].substring(0, parts[1].length() - 1) : parts[1];
+		String chatBody = "";
+		String username = "";
+		if(parts[0].startsWith("[War]")){
+			boolean matchFound = false;
+			String[] cities = {"Kabul", "Delhi", "Mumbai, Amsterdam"};
+			String[] parts2 = messageString.split(" ");
+			for (String city : cities){
+				if (city.equals(parts2[4])) {
+					matchFound = true;
+					break;
+				}
+			}
+			if (matchFound){
+				String coordinatesPart = messageString.split("at ")[1];
+				coordinatesPart = coordinatesPart.replaceAll("[()]", "");
+				String[] coordinates = coordinatesPart.split(", ");
+				chatBody = String.format("Ping at {minecraft:overworld:(%d, %d, %d)}", Integer.parseInt(coordinates[0].trim(), Integer.parseInt(coordinates[1].trim(), Integer.parseInt(coordinates[2].trim()))));
+				username = "Ataque";
+			}
+		}
+		else {
+			username = parts[1].endsWith(":") ? parts[1].substring(0, parts[1].length() - 1) : parts[1];
 
 // El cuerpo del mensaje es la tercera parte después de dividir por el segundo espacio
-		String chatBody = parts[2];
+			chatBody = parts[2];
+		}
 		Ping parseResult = Ping.deserialize(chatBody, username);
 		if (parseResult == null) {
 			return;
 		}
+// El nombre de usuario estaría en la segunda parte, después de omitir el prefijo [Town]/[Nation]
+// Además, eliminamos los dos puntos al final si están presentes
 
 		// If the config says to hide ping messages, cancel the event
 		if (!Globals.CONFIG.showPingsInChat()) {
