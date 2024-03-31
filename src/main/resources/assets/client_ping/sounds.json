@@ -1,0 +1,12 @@
+{
+  "ping_sound": {
+    "sounds": [
+      "client_ping:ping"
+    ]
+  },
+  "ping_sound2": {
+    "sounds": [
+      "client_ping:ping2"
+    ]
+  }
+}
